@@ -1,11 +1,9 @@
 import requests
 import random
-import shutil
 
 from colorama import init, Fore
 from PyTerm import Console
 
-width = shutil.get_terminal_size().columns
 init(autoreset=True)
 Console.clear()
 
