@@ -1,56 +1,53 @@
-import requests, random, string, bs4, os
-import rich
-from rich import print
-from rich.console import Console
-import time
+import requests
+import random
+import shutil
 
+from colorama import init, Fore
+from PyTerm import Console
 
-console = Console()
+width = shutil.get_terminal_size().columns
+init(autoreset=True)
+Console.clear()
 
-os.system("cls")
-console.print(f"""\n\n
+print(
+    f"""{Fore.LIGHTMAGENTA_EX}
 
                  '
             *          .
                    *       '
-              *                *                               
-      _ _|_  _   _. ._ _    ._   _  |  
-     _>  |_ (/_ (_| | | |   |_) (_) |< 
-                            |          
+              *                *
+      _ _|_  _   _. ._ _    ._   _  |
+     _>  |_ (/_ (_| | | |   |_) (_) |<
+                            |
        '*
            *
                 *
                        *
                *
                      *
-
-                                                      
-\n""", style="purple")
-
-
-#Config
-len = 5
-webhook = input("           Webhook: ")
-
-#Check webhook
-r = requests.get(webhook)
-r.status_code
-if r.status_code == 401:
-    console.print("           Invalid Webhook", style="red")
-    time.sleep(2.4)
-    exit()
+\n"""
+)
 
 
+webhook = input('Webhook: ')
+length = input('Length: ')
 
-#User check
+
 while True:
-    id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=len))
-    request = requests.get(f'https://steamcommunity.com/id/{id}')
-    lxml = bs4.BeautifulSoup(request.content, 'lxml')
-    title = lxml.find('title')
-    list = title.text.split()
-    if list[-1] == "Error":
-        print(f'{id} is Available')
-        requests.post(webhook, data={"content" : "\🌠 New username avalible `" f'{id} ' "` \n rember **it can be banned** or **blacklisted** ;3\n`--------------------------------`"})
+    id = ''.join(
+        random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+        for i in range(int(length))
+    )
+    r = requests.get(
+        f'https://steamcommunity.com/id/{id}',
+        headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
+        },
+    )
+
+    # search for a string that shows on non-existent profiles
+    if 'The specified profile could not be found.' in r.text:
+        print(f'{Fore.LIGHTGREEN_EX}ID: {id} is available!')
+        requests.post(webhook, json={'content': f'\🌠 New ID available "[`{id}`](<https://steamcommunity.com/id/{id}>)"\n\nremember that it may be **blacklisted**'})
     else:
-        print(f'{id} is Taken')
+        print(f'{Fore.LIGHTRED_EX}ID: {id} is taken!')
